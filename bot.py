@@ -13,6 +13,7 @@ def log(message, answer):
                                                                    str(message.from_user.id),
                                                                    message.text))
     print(answer)
+    
 @bot.message_handler(commands=['start'])
 def handle_start(message):
     user_markup = telebot.types.ReplyKeyboardMarkup(True)
@@ -21,10 +22,12 @@ def handle_start(message):
     answer = 'Привет мой сладенький синнабон,что тебя волнует?'
     log(message,answer)
     bot.send_message(message.chat.id, answer, reply_markup=user_markup)
+    
 @bot.message_handler(commands=['stop'])
 def handle_start(message):
     hide_markup = telebot.types.ReplyKeyboardRemove()
-    bot.send_message(message.chat.id, "Ну да, пошёл я нахер(", reply_markup=hide_markup)
+    bot.send_message(message.chat.id, "Пока(", reply_markup=hide_markup)
+    
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     if message.text == 'Поиск информации':
@@ -34,6 +37,6 @@ def handle_text(message):
             wikipedia.set_lang('ru')
             bot.reply_to(message, wikipedia.summary(message.text.lower()))
         except:
-            bot.reply_to(message, "Кто этот ваш", message.text.lower() ,'нахуй')
+            bot.reply_to(message, "Я не смог найти ", message.text.lower())
 
 bot.polling(none_stop=True)
