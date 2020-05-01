@@ -1,8 +1,9 @@
 import telebot
 import wikipedia
 
-
+bot = telebot.TeleBot("token")
 print(bot.get_me())
+
 
 def log(message, answer):
     print('\n ==========')
@@ -13,30 +14,45 @@ def log(message, answer):
                                                                    str(message.from_user.id),
                                                                    message.text))
     print(answer)
-    
+
+
 @bot.message_handler(commands=['start'])
 def handle_start(message):
     user_markup = telebot.types.ReplyKeyboardMarkup(True)
-    user_markup.row('/start', '/stop')
-    user_markup.row('Поиск картинки', 'Поиск информации')
-    answer = 'Привет мой сладенький синнабон,что тебя волнует?'
-    log(message,answer)
+    user_markup.row('💵 Donate', '🔎 Search')
+    answer = 'Hi, i`m a Bot with searching API, you can find all information what you want 😉' \
+             '\n\nSome commands:' \
+             '\n/start' \
+             '\n/search' \
+             '\n/donate' \
+             '\n/stop'
+    log(message, answer)
     bot.send_message(message.chat.id, answer, reply_markup=user_markup)
-    
+
+
 @bot.message_handler(commands=['stop'])
 def handle_start(message):
     hide_markup = telebot.types.ReplyKeyboardRemove()
-    bot.send_message(message.chat.id, "Пока(", reply_markup=hide_markup)
-    
-@bot.message_handler(content_types=['text'])
+    answer = "Ok,bye. 😔"
+    bot.send_message(message.chat.id, answer, reply_markup=hide_markup)
+
+
+@bot.message_handler(commands=['donate'])
 def handle_text(message):
-    if message.text == 'Поиск информации':
-        bot.send_message(message.chat.id, 'Введите что бы вы хотели узнать')
-    else:
-        try:
-            wikipedia.set_lang('ru')
-            bot.reply_to(message, wikipedia.summary(message.text.lower()))
-        except:
-            bot.reply_to(message, "Я не смог найти ", message.text.lower())
+    answer = 'Here is my card for payments "5168 3212 3942 1239"'
+    bot.send_message(message.chat.id, answer)
+    bot.send_photo(message.chat.id, photo=open('cat.jpg', 'rb'), caption='thanks <3')
+
+
+@bot.message_handler(commands=['search'])
+def handle_search(message):
+    message_text_list = message.text.lower().split()
+    search_query = str(message_text_list[1])
+    try:
+        wikipedia.set_lang('ru')
+        bot.reply_to(message.chat.id, wikipedia.summary(search_query))
+    except wikipedia.HTTPTimeoutError:
+        bot.reply_to(message.chat.id, "I cant find, {} 🤯".format(search_query))
+
 
 bot.polling(none_stop=True)
